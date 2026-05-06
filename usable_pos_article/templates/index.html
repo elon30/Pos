@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>POS BPM Analyzer</title>
+    <style>
+      body { font-family: Arial, sans-serif; max-width: 780px; margin: 40px auto; padding: 0 16px; }
+      h1 { margin-bottom: 8px; }
+      .card { border: 1px solid #ddd; border-radius: 10px; padding: 18px; }
+      button { margin-top: 12px; padding: 10px 16px; cursor: pointer; }
+      pre { background: #f7f7f7; border-radius: 8px; padding: 12px; overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <h1>POS BPM Analyzer</h1>
+    <p>Upload a face video and get estimated BPM from the POS pipeline.</p>
+    <div class="card">
+      <input id="videoInput" type="file" accept="video/*" />
+      <br />
+      <button id="runBtn">Analyze BPM</button>
+      <p id="status"></p>
+      <pre id="result"></pre>
+    </div>
+
+    <script>
+      const runBtn = document.getElementById("runBtn");
+      const statusNode = document.getElementById("status");
+      const resultNode = document.getElementById("result");
+
+      runBtn.addEventListener("click", async () => {
+        const fileInput = document.getElementById("videoInput");
+        const file = fileInput.files[0];
+
+        if (!file) {
+          statusNode.textContent = "Please select a video first.";
+          return;
+        }
+
+        statusNode.textContent = "Processing video, this can take a while...";
+        resultNode.textContent = "";
+
+        const formData = new FormData();
+        formData.append("video", file);
+
+        try {
+          const response = await fetch("/analyze", { method: "POST", body: formData });
+          const json = await response.json();
+
+          if (!response.ok) {
+            throw new Error(json.error || "Failed to analyze video");
+          }
+
+          statusNode.textContent = `Done. Mean BPM: ${json.summary.mean_bpm ?? "N/A"}`;
+          resultNode.textContent = JSON.stringify(json, null, 2);
+        } catch (err) {
+          statusNode.textContent = `Error: ${err.message}`;
+        }
+      });
+    </script>
+  </body>
+</html>

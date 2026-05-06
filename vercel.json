@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "usable_pos_article/web_app.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "usable_pos_article/web_app.py" }
+  ]
+}
