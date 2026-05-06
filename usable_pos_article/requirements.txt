@@ -1,6 +1,5 @@
 numpy
 scipy
 opencv-python-headless
-mediapipe
 flask
 gunicorn
